@@ -7,7 +7,4 @@ class Report < ApplicationRecord
     images.each{|image| image.url}
   end
 
-  def add_to_marker(obj=self)
-    Marker.add_report obj
-  end
 end

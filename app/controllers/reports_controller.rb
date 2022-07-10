@@ -1,10 +1,9 @@
 class ReportsController < ApplicationController
   before_action :set_report, only: %i[ show update destroy ]
+  before_action :get_reports, only: %i[ index ]
 
   # GET /reports
   def index
-    @reports = Report.all
-
     render json: @reports
   end
 
@@ -15,9 +14,21 @@ class ReportsController < ApplicationController
 
   # POST /reports
   def create
-    @report = Report.new(report_params)
+    lonlat = report_params[:lonlat]
 
-    if @report.save
+    if Marker.exists?(lonlat: lonlat)
+      puts "Use Existing Marker"
+      new_report = Report.new(report_params)
+      new_report.marker = Marker.find_by(lonlat: lonlat)
+      success = new_report.save
+    else
+      puts "Create New Marker"
+      new_marker = Marker.new(lonlat: lonlat, place_name: report_params[:place_name])
+      new_marker.reports.build(report_params)
+      success = new_marker.save
+    end
+
+    if success
       render json: @report, status: :created, location: @report
     else
       render json: @report.errors, status: :unprocessable_entity
@@ -46,6 +57,15 @@ class ReportsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def report_params
-      params.require(:report).permit(:user_id, :marker_id, :lonlat, :description)
+      report = params.require(:report)
+      report.require(:lonlat)
+      report = report.permit(:user_id, :marker_id, :image_ids, :lonlat, :description, :place_name)
+      report[:image_ids] = params[:image_ids]
+      report
     end
+
+  # get reports belonging to the marker
+  def get_reports
+    @reports = Marker.find(params[:marker_id]).reports
+  end
 end

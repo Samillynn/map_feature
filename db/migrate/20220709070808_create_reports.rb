@@ -3,7 +3,7 @@ class CreateReports < ActiveRecord::Migration[7.0]
     create_table :reports do |t|
       t.references :user, null: false , foreign_key: true
       t.references :marker, null: false , foreign_key: true
-      t.string :lonlat
+      t.string :lonlat, null: false
       t.text :description
 
       t.timestamps
