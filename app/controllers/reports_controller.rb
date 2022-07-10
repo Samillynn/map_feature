@@ -21,17 +21,19 @@ class ReportsController < ApplicationController
       new_report = Report.new(report_params)
       new_report.marker = Marker.find_by(lonlat: lonlat)
       success = new_report.save
+      new_entry = new_report
     else
       puts "Create New Marker"
       new_marker = Marker.new(lonlat: lonlat, place_name: report_params[:place_name])
       new_marker.reports.build(report_params)
       success = new_marker.save
+      new_entry = new_marker
     end
 
     if success
-      render json: @report, status: :created, location: @report
+      render json: new_entry, status: :created, location: new_entry
     else
-      render json: @report.errors, status: :unprocessable_entity
+      render json: new_entry.errors, status: :unprocessable_entity
     end
   end
 
@@ -57,11 +59,7 @@ class ReportsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def report_params
-      report = params.require(:report)
-      report.require(:lonlat)
-      report = report.permit(:user_id, :marker_id, :image_ids, :lonlat, :description, :place_name)
-      report[:image_ids] = params[:image_ids]
-      report
+      params.require(:report).permit(:user_id, :marker_id, :lonlat, :description, :place_name, image_ids: [])
     end
 
   # get reports belonging to the marker

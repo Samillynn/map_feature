@@ -1,6 +1,6 @@
 class Report < ApplicationRecord
   belongs_to :marker, optional: true
-  has_one :user, through: :marker
+  belongs_to :user
   has_many :images
 
   def image_urls
