@@ -1,6 +1,9 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
+
+  Rails.application.routes.default_url_options[:host] = "127.0.0.1:1234"
+  # Rails.application.routes.default_url_options[:port] = Rails::Server.new.options[:Port]
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time

@@ -4,7 +4,6 @@ class Report < ApplicationRecord
   has_many :images
 
   def image_urls
-    images.each{|image| image.url}
+    images.map{|image| image.url}
   end
-
 end
